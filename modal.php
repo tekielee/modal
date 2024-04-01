@@ -2,10 +2,7 @@
 /** Plugin Name: Modal
 ** Author: Cuong Le
 ** Version: 1.0
-** Description: Create a modal custom post type where authors can add content. 
-** Authors will associate the modal to a specific URL. The Modal will show the first time 
-** an user land in the page and won’t show again after assertive action by user. 
-** If the user declines the Modal, it will redirect to blackstone.com home page.
+** Description: Create a modal custom post type where authors can add content. Authors will associate the modal to a specific URL. The Modal will show the first time an user land in the page and won’t show again after assertive action by user. If the user declines the Modal, it will redirect to blackstone.com home page.
 */
 
 register_activation_hook( __FILE__, 'author_modal_setup_table' );
