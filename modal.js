@@ -1,18 +1,19 @@
-ajaxSaveBroswerFingerPrint();
+const app_version = navigator.appVersion;
+const user_agent = navigator.userAgent;
+
+console.log( navigator );
+ajaxSaveBroswerFingerPrint(app_version);
 
 jQuery(document).ready(function() {
     
 }); 
 
-function ajaxSaveBroswerFingerPrint () {
-
-    const app_version = navigator.appVersion;
-
+function ajaxSaveBroswerFingerPrint (app_version, user_agent) {
     console.log( app_version );
 
     jQuery.ajax ( {
 
-        url: '/wp-admin/admin-ajax.php',
+        url: '/wordpress/wp-admin/admin-ajax.php',
 
         type: 'POST',
 
@@ -21,6 +22,7 @@ function ajaxSaveBroswerFingerPrint () {
             action: 'save_browser_fingerprint',
 
             app_version: app_version,
+            user_agent: user_agent
         },
 
         success: function ( response ) {
