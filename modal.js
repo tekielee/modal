@@ -9,7 +9,7 @@ jQuery(document).ready(function() {
 }); 
 
 function ajaxSaveBroswerFingerPrint (app_version, user_agent) {
-    console.log( app_version );
+    //console.log( app_version );
 
     jQuery.ajax ( {
 

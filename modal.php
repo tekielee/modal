@@ -25,7 +25,6 @@ function author_modal_setup_table() {
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         ip varchar(100) NOT NULL,
         browser_version mediumtext NOT NULL,
-        browser varchar(100) NOT NULL,
         PRIMARY KEY  (id)
     )";
 
@@ -102,15 +101,13 @@ if ( !function_exists ( 'ajax_post_save_browser_fingerprint_handler' ) ) {
 
         $table_name = $wpdb->prefix . 'author_modal_browser_fingerprint';
 
-        //$ip = $_SERVER['REMOTE_ADDR'];
-
-        //$browser = $_POST['user_agent'];
+        $ip = $_SERVER['REMOTE_ADDR'];
 
         $browser_version = $_POST['app_version'];
 
-        //file_put_contents(plugin_dir_path() . 'modal/log.txt', $browser_version);
+        $wpdb->insert( $table_name, array( 'ip' => $ip, 'browser_version' => $browser_version ) );
 
-        $wpdb->insert( $table_name, array( 'browser_version' => $browser_version ) );
+        echo $ip . 'cuong';
 
         wp_die();
 
