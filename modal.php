@@ -90,9 +90,30 @@ if ( ! function_exists ( 'author_modal_content_menu_page' ) ) {
 
 }
 
+add_action( 'wp_ajax_save_browser_fingerprint', 'ajax_post_save_browser_fingerprint_handler' );
 
+add_action( 'wp_ajax_nopriv_save_browser_fingerprint', 'ajax_post_save_browser_fingerprint_handler' );
 
+if ( !function_exists ( 'ajax_post_save_browser_fingerprint_handler' ) ) {
 
+    function ajax_post_save_browser_fingerprint_handler () {
 
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'author_modal_browser_fingerprint';
+
+        $ip = $_SERVER['REMOTE_ADDR'];
+
+        $browser = $_SERVER['HTTP_USER_AGENT'];
+
+        $browser_version = $_POST['app_version'];
+
+        $wpdb->insert( $table_name, array( 'ip' => $ip, 'browser' => $browser, 'browser_version' => $browser_version ) );
+
+        wp_die();
+
+    }
+
+}
 
 ?>
