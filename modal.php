@@ -12,7 +12,7 @@ function author_modal_setup_table() {
     global $wpdb;
 
     $table_name = $wpdb->prefix . 'author_modal';
-    $table_name = $wpdb->prefix . 'author_modal_browser_fingerprint';
+    $table_name_2 = $wpdb->prefix . 'author_modal_browser_fingerprint';
 
     $sql = "CREATE TABLE $table_name (
       id mediumint(9) NOT NULL AUTO_INCREMENT,
@@ -21,13 +21,13 @@ function author_modal_setup_table() {
       PRIMARY KEY  (id)
     )";
 
-$sql_2 = "CREATE TABLE $table_name (
-    id mediumint(9) NOT NULL AUTO_INCREMENT,
-    ip varchar(100) NOT NULL,
-    browser_version varchar(100) NOT NULL,
-    browser varchar(100) NOT NULL,
-    PRIMARY KEY  (id)
-  )";
+    $sql_2 = "CREATE TABLE $table_name_2 (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        ip varchar(100) NOT NULL,
+        browser_version varchar(100) NOT NULL,
+        browser varchar(100) NOT NULL,
+        PRIMARY KEY  (id)
+    )";
 
     require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
     dbDelta( $sql );
@@ -76,9 +76,7 @@ if ( ! function_exists ( 'author_modal_content_menu_page' ) ) {
         
                 <label>Content</label>
 
-        <textarea id="left-footer" name="left-footer" rows="10">' . 
-        
-            wp_unslash ( get_option ( 'left_footer' ) )
+        <textarea id="left-footer" name="left-footer" rows="10">' 
         
         . '</textarea>
 
@@ -87,7 +85,7 @@ if ( ! function_exists ( 'author_modal_content_menu_page' ) ) {
     </div>
         
         
-        ''
+        ';
     }
 
 }
