@@ -49,7 +49,6 @@ if(!function_exists('modal_custom_post_type')) {
             'public' => true,
             'supports' => array('title', 'editor', 'thumbnail', 'custom-fields'),
             'has_archive' => true,
-            'rewrite' => array('slug' => 'modal'),
             'show_in_rest' => true
         ));
 
