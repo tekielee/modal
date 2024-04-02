@@ -18,7 +18,7 @@ function author_modal_setup_table() {
       id mediumint(9) NOT NULL AUTO_INCREMENT,
       content text NOT NULL,
       associate_url mediumtext NOT NULL,
-      display tinyint(1) NOT NULL DEFAULT 1,
+      display tinyint(1) NOT NULL DEFAULT 0,
       PRIMARY KEY  (id)
     )";
 
@@ -84,7 +84,7 @@ if ( ! function_exists ( 'author_modal_content_menu' ) ) {
 
 if ( ! function_exists ( 'get_associate_urls_list' ) ) {
 
-    function get_associate_urls_list() {
+    function get_associate_urls_list($id) {
 
         global $wpdb;
 
@@ -92,19 +92,27 @@ if ( ! function_exists ( 'get_associate_urls_list' ) ) {
 
         $associate_urls = $wpdb->get_results( "SELECT id, associate_url FROM {$table_name}" );
 
-        $select = '<select id="associate-url" name="associate-url">';
+        $selected = '';
 
-            foreach ( $associate_urls as $associate_url ) {
+        $select = '<select id="associate-url-list" name="associate-url-list">';
 
-                $select .= '<option value="' . $associate_url->id . '">' . $associate_url->associate_url . '</option>';
+        foreach ( $associate_urls as $associate_url ) {
 
-            }
+            if((int)$associate_url->id === (int)$id)
 
-            $select .= '</select>';
+                $selected = 'selected=selected';
+                
+            else
 
-            return $select;
+                $selected ='';
 
-        return $associate_urls;
+            $select .= '<option value="' . $associate_url->id . '" ' . $selected . '>' . $associate_url->associate_url . '</option>';
+
+        }
+
+        $select .= '</select>';
+
+        return $select;
 
     }
 
@@ -117,10 +125,43 @@ if ( ! function_exists ( 'author_modal_content_menu_page' ) ) {
     function author_modal_content_menu_page () {
 
         global $wpdb;
-
+    
         $table_name = $wpdb->prefix . 'author_modal';
 
-        $content = $wpdb->get_results( "SELECT content, associate_url FROM {$table_name} limit 1" );
+    
+        $results = $wpdb->get_results( "SELECT * FROM {$table_name} where display = 1" );
+
+        //print_r($results);
+
+        if (empty($results)) {
+                
+                $content = '';
+
+                $associate_url = '';
+
+                $display = 'unchecked';
+
+                $id = 0;
+
+        } else {
+
+            $content = wp_unslash($results[0]->content);
+
+            $associate_url = $results[0]->associate_url;
+
+            if((int)$results[0]->display === 1)  {
+
+                $display = 'checked';
+
+            } else {
+
+                $display = 'unchecked';
+
+            }
+
+            $id = $results[0]->id;
+
+        }
         
         $author = '
 
@@ -128,19 +169,25 @@ if ( ! function_exists ( 'author_modal_content_menu_page' ) ) {
 
                 <label>Select Associate URL</label>
 
-            ' . get_associate_urls_list() . ' 
+            ' . get_associate_urls_list($id) . ' 
 
                 <br/>
         
                 <label>Content</label>
 
-                <textarea id="author-content" name="author-content" cols="100" rows="10">'. wp_unslash($content[0]->content) .'</textarea>
+                <textarea id="author-content" name="author-content" cols="100" rows="10">'. $content .'</textarea>
 
                 <br/>
 
-                <label>Url</label>
+                <label>Associate Url</label>
 
-                <input id="associate-url" name="associate-url" value="'. $content[0]->associate_url .'"style="width:100%;" />
+                <input type="text" id="associate-url" name="associate-url" value="'. $associate_url .'" style="width:100%;" />
+
+                <br/>
+
+                <label>Display Modal</label>
+
+                <input type="checkbox" id="display" name="display" ' . $display . '/>
 
                 <br/>
 
@@ -174,16 +221,50 @@ if ( !function_exists ( 'ajax_post_save_author_content_handler' ) ) {
 
         $associate_url = $_POST['associate_url'];
 
-        $wpdb->insert( $table_name, 
+        $display = $_POST['display'];
 
-        array(
-            'content' => $content, 
-            'associate_url' => $associate_url 
-        ),
-        array(
-            '%s',
-            '%s',
-        ) );
+        $result = $wpdb->get_results( "SELECT id FROM {$table_name} where associate_url = '{$associate_url}'" );
+
+        if ( (int)count($result) === 0 ) {
+
+            $wpdb->insert( $table_name, 
+
+            array(
+                'content' => $content, 
+                'associate_url' => $associate_url,
+                'display' => $display
+            ),
+            array(
+                '%s',
+                '%s',
+                '%d',
+            ) );
+
+        } else {
+
+            $wpdb->query(
+                "UPDATE {$table_name} SET display = 0"
+            );
+                
+            $wpdb->update( $table_name, 
+
+            array(
+                'content' => $content, 
+                'associate_url' => $associate_url,
+                'display' => $display
+            ),
+            array(
+                'id' => $result[0]->id,
+            ),
+            array(
+                '%s',
+                '%s',
+                '%d',
+            ),
+            array(
+                '%d',
+            ) );
+        }
 
         echo 'Content saved';
 
@@ -257,6 +338,16 @@ function modal_author_routes() {
             'permission_callback' => '__return_true'
         )
     );
+
+    register_rest_route(
+        'modal-api/v1',
+        '/modal/',
+        array(
+            'methods'  => 'GET',
+            'callback' => 'modal_callback',
+            'permission_callback' => '__return_true'
+        )
+    );
 }
 
 if (!function_exists('browser_inf_callback')) {
@@ -287,19 +378,32 @@ if (!function_exists('author_content_callback')) {
 
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'author_modal_browser_fingerprint';
+        $table_name = $wpdb->prefix . 'author_modal';
 
-        $ip = $_SERVER['REMOTE_ADDR'];
+        $id = $_GET['id'];
 
-        $browser_version = $_GET['app_version'];
+        $results = $wpdb->get_results( "SELECT * FROM {$table_name} where id = '{$id}'" );
 
-        $total_query = "SELECT COUNT(*) FROM {$table_name} where ip = '{$ip}' and browser_version = '{$browser_version}'";
-
-        $total = $wpdb->get_var( $total_query );
-
-        echo json_encode(array('count' => $total));
+        echo json_encode( wp_unslash($results[0]), true);
     
     }
 
+
+    if (!function_exists('modal_callback')) {
+
+        function modal_callback( $data ) {
+    
+            global $wpdb;
+    
+            $table_name = $wpdb->prefix . 'author_modal';
+
+    
+            $results = $wpdb->get_results( "SELECT * FROM {$table_name} where display = 1" )[0];
+    
+            echo json_encode( wp_unslash($results), true);
+        
+        }
+    
+    }
 }
 ?>

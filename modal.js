@@ -13,8 +13,31 @@ jQuery(document).ready(function() {
 function displayModal() {
 
     console.log('displayModal');
-    alert('displayModal'); 
 
+    
+    jQuery.ajax({
+
+        url: '/wordpress/wp-json/modal-api/v1/modal',
+
+        type: "GET",
+
+        success: function(response) {
+
+            console.log(response);
+
+            let content = response['content'];
+
+            let associate_url = response['associate_url'];
+
+            let display = response['display'];
+
+            jQuery('#author-content').val(content);
+
+            jQuery('#associate-url').val(associate_url);
+
+        }
+
+        });
 
 }
 
