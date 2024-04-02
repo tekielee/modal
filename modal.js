@@ -15,7 +15,7 @@ function displayModal() {
     
     jQuery.ajax({
 
-        url: '/wordpress/wp-json/modal-api/v1/modal',
+        url: '/wp-json/modal-api/v1/modal',
 
         type: "GET",
 
@@ -43,11 +43,11 @@ function displayModal() {
 
 function showModal(app_version) {
 
-    console.log('/wordpress/wp-json/modal-api/v1/browser-inf/?app_version=' + app_version);
+    console.log('/wp-json/modal-api/v1/browser-inf/?app_version=' + app_version);
 
     jQuery.ajax({
 
-        url: '/wordpress/wp-json/modal-api/v1/browser-inf/?app_version=' + app_version,
+        url: '/wp-json/modal-api/v1/browser-inf/?app_version=' + app_version,
 
         type: "GET",
 
@@ -61,9 +61,13 @@ function showModal(app_version) {
 
             ajaxSaveBroswerFingerPrint(app_version);
 
+            console.log('save');
+
           } else {
 
             ajaxSaveBroswerFingerPrint(app_version);
+
+            console.log('save');
 
           }
 
@@ -78,7 +82,7 @@ function ajaxSaveBroswerFingerPrint (app_version) {
 
     jQuery.ajax ( {
 
-        url: '/wordpress/wp-admin/admin-ajax.php',
+        url: '/wp-admin/admin-ajax.php',
 
         type: 'POST',
 

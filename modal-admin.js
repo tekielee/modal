@@ -20,7 +20,7 @@ function ajaxGetAuthorContent () {
 
         jQuery.ajax({
 
-            url: '/wordpress/wp-json/modal-api/v1/author-content/?id=' + id,
+            url: '/wp-json/modal-api/v1/author-content/?id=' + id,
     
             type: "GET",
     
