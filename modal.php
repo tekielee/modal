@@ -35,6 +35,28 @@ function author_modal_setup_table() {
 
 }
 
+add_action('init', 'modal_custom_post_type');
+
+if(!function_exists('modal_custom_post_type')) {
+
+    function modal_custom_post_type() {
+
+        register_post_type('author_modal', array(
+            'labels' => array(
+                'name' => 'Content Modal',
+                'singular_name' => 'modal',
+            ),
+            'public' => true,
+            'supports' => array('title', 'editor', 'thumbnail', 'custom-fields'),
+            'has_archive' => true,
+            'rewrite' => array('slug' => 'modal'),
+            'show_in_rest' => true
+        ));
+
+    }
+
+}
+
 add_action ( 'admin_enqueue_scripts', 'author_modal_scripts' );
 
 if ( ! function_exists ( 'author_modal_scripts' ) ) {
