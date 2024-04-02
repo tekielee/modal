@@ -29,15 +29,17 @@ function displayModal() {
 
             let associate_url = response['associate_url'];
 
-            let display = response['display'];
+            jQuery('body').append('<div class="modal-container"><div class="modal-content">' + content + 
+            
+            '<div class="accept-decline"><button onclick="window.location.href=\'https://www.blackstone.com\';">Decline</button>' +
 
-            jQuery('#author-content').val(content);
+            '<button onclick="window.location.href=\''+associate_url+'\';">Accept</button></div>' +
 
-            jQuery('#associate-url').val(associate_url);
+            '</div>');
 
         }
 
-        });
+    });
 
 }
 
