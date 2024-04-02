@@ -5,8 +5,6 @@ console.log( navigator );
 jQuery(document).ready(function() {
 
     showModal(app_version);
-
-    ajaxSaveBroswerFingerPrint(app_version);
     
 });
 
@@ -57,9 +55,15 @@ function showModal(app_version) {
 
           console.log(response['count']);
 
-          if (parseInt(response['count']) > 0) {
+          if (parseInt(response['count']) === 0) {
 
             displayModal();
+
+            ajaxSaveBroswerFingerPrint(app_version);
+
+          } else {
+
+            ajaxSaveBroswerFingerPrint(app_version);
 
           }
 
